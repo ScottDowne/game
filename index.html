@@ -68,15 +68,22 @@ collisionImg.addEventListener( "load", function() {
   };
 
   var speed = speedSelect.value;
-  speedSelect.addEventListener( "change", function( e ) {
+
+  function speedSelectChange( e ) {
     document.addEventListener( "keydown", keyDown, false);
+    speedSelect.addEventListener( "mousedown", speedSelectMouseDown, false );
     speed = this.value;
     this.blur();
-  }, false );
-  speedSelect.addEventListener( "click", function( e ) {
+  }
+
+  function speedSelectMouseDown( e ) {
+    speedSelect.removeEventListener( "mousedown", speedSelectMouseDown, false );
     document.removeEventListener( "keydown", keyDown, false);
     clearMovement();
-  }, false );
+  }
+
+  speedSelect.addEventListener( "change", speedSelectChange, false );
+  speedSelect.addEventListener( "mousedown", speedSelectMouseDown, false );
   var moving = false;
   var movementTimeout;
   var numberOfFrames = 8;
