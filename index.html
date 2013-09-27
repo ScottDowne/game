@@ -1,19 +1,27 @@
 <body style="margin: 0;">
 <div id="background" style="background: url(kq2bgs.png); height: 168px; width: 320px; image-rendering: -moz-crisp-edges;"></div>
 <div id="player" style="position: absolute; top: 60; left:140; background: url(playerUpdate.png); height: 32px; width: 12px; image-rendering: -moz-crisp-edges;"></div>
-<img id="collision" style="display: none;" src="kq2bgsCollision.png">
+<img id="collision" style="display: none;">
+<select id="speed">
+  <option value="50" >Fast</option>
+  <option value="100" selected>Normal</option>
+  <option value="200" >Slow</option>
+  <option value="0">Fastest</option>
+</select>
 <script>
-document.addEventListener( "DOMContentLoaded", function() {
-  var background = document.getElementById( "background" );
-  var player = document.getElementById( "player" );
-  var collisionImg = document.getElementById( "collision" );
-
+var background = document.getElementById( "background" );
+var player = document.getElementById( "player" );
+var collisionImg = document.getElementById( "collision" );
+var speedSelect = document.getElementById( "speed" );
+collisionImg.addEventListener( "load", function() {
+  collisionImg.src = "kq2bgsCollision.png";
   var canvas = document.createElement( "canvas" );
   canvas.width = collisionImg.width;
   canvas.height = collisionImg.height;
-  canvas.getContext("2d").drawImage(collisionImg, 0, 0, collisionImg.width, collisionImg.height);
+  canvas.getContext("2d").drawImage(collisionImg, 0, 0, collisionImg.width, collisionImg.height );
   var collisionData = canvas.getContext("2d");
-
+  var allCollisionData = collisionData.getImageData( 0, 0, collisionImg.width, collisionImg.height );
+console.log(allCollisionData);
   function checkCollision( playerLeft, playerTop, backgroundLeft, backgroundTop ) {
     var pixel = collisionData.getImageData( playerLeft, playerTop+30, 12, 1 );
     for (var i = 0; i < 12; i++) {
@@ -58,11 +66,10 @@ document.addEventListener( "DOMContentLoaded", function() {
     down: 40
   };
 
-  // fastest 0
-  // fast 50
-  // normal 100
-  // slow 200
-  var speed = 100;
+  var speed = speedSelect.value;
+  speedSelect.addEventListener( "change", function( e ) {
+    speed = this.value;
+  }, false );
   var moving = false;
   var movementTimeout;
   var numberOfFrames = 8;
@@ -188,5 +195,7 @@ document.addEventListener( "DOMContentLoaded", function() {
 
   document.addEventListener( "keydown", keyDown, false);
 }, false );
+
+collisionImg.src = "kq2bgsCollision.png";
 </script>
 </body>
