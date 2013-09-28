@@ -298,10 +298,11 @@ collisionImg.addEventListener( "load", function() {
     }
   }
 
-  function onBackgroundClick( e ) {
-    clickMap.removeEventListener( "mousedown", onBackgroundClick, false);
-    var topDiff = e.clientY - playerPosition.top;
-    var leftDiff = e.clientX - playerPosition.left;
+  function onBackgroundClick( x, y ) {
+console.log(x, y);
+    removeClick();
+    var topDiff = y - playerPosition.top;
+    var leftDiff = x - playerPosition.left;
     var keyCode;
     if (Math.abs(topDiff) < Math.abs(leftDiff)) {
       if ( leftDiff > 0 ) {
@@ -328,11 +329,11 @@ collisionImg.addEventListener( "load", function() {
           moving = true;
           startMovement();
         }
-        clickMap.addEventListener( "mousedown", onBackgroundClick, false);
+        addClick();
         return;
       }
     }
-    clickMap.addEventListener( "mousedown", onBackgroundClick, false);
+    addClick();
   }
 
   function keyUp( e ) {
@@ -340,7 +341,41 @@ collisionImg.addEventListener( "load", function() {
     document.removeEventListener( "keyup", keyUp, false);
   }
 
-  clickMap.addEventListener( "mousedown", onBackgroundClick, false);
+  function onBackgroundMouseClick( e ) {
+    onBackgroundClick( e.clientX, e.clientY );
+  }
+  function onBackgroundTouchClick( e ) {
+    var item = e.touches.item( 0 );
+    onBackgroundClick( item.clientX, item.clientY );
+  }
+
+  function addClick() {}
+  function removeClick() {}
+  function setMouseEvents( e ) {
+    addClick = function() {
+      //clickMap.addEventListener( "mousedown", onBackgroundMouseClick, false);
+    }
+    removeClick = function() {
+      clickMap.removeEventListener( "mousedown", onBackgroundMouseClick, false);
+    }
+    clickMap.removeEventListener( "touchstart", setTouchEvents, false);
+    clickMap.removeEventListener( "mousedown", setMouseEvents, false);
+    onBackgroundClick( e.clientX, e.clientY );
+  }
+  function setTouchEvents( e ) {
+    addClick = function() {
+      clickMap.addEventListener( "touchstart", onBackgroundTouchClick, false);
+    }
+    removeClick = function() {
+      clickMap.removeEventListener( "touchstart", onBackgroundTouchClick, false);
+    }
+    clickMap.removeEventListener( "mousedown", setMouseEvents, false);
+    clickMap.removeEventListener( "touchstart", setTouchEvents, false);
+    onBackgroundClick( e );
+  }
+
+  clickMap.addEventListener( "mousedown", setMouseEvents, false);
+  clickMap.addEventListener( "touchstart", setTouchEvents, false);
   document.addEventListener( "keydown", keyDown, false);
 }, false );
 
