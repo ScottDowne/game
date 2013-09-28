@@ -109,7 +109,6 @@ collisionImg.addEventListener( "load", function() {
   canvas.height = collisionImg.height;
   canvas.getContext("2d").drawImage(collisionImg, 0, 0, collisionImg.width, collisionImg.height );
   var collisionData = canvas.getContext("2d");
-console.log(background.offsetWidth, collisionImg.width);
   playerHeight = player.offsetHeight;
   playerWidth = player.offsetWidth;
   backgroundHeight = background.offsetHeight;
