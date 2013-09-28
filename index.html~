@@ -299,10 +299,11 @@ collisionImg.addEventListener( "load", function() {
   }
 
   function onBackgroundClick( e ) {
+    clickMap.removeEventListener( "click", onBackgroundClick, false);
     var topDiff = e.clientY - playerPosition.top;
     var leftDiff = e.clientX - playerPosition.left;
     var keyCode;
-    if (Math.abs(topDiff) > Math.abs(leftDiff)) {
+    if (Math.abs(topDiff) < Math.abs(leftDiff)) {
       if ( leftDiff > 0 ) {
         keyCode = 39;
       } else {
@@ -315,8 +316,6 @@ collisionImg.addEventListener( "load", function() {
         keyCode = 38;
       }
     }
-    console.log( "top",topDiff );
-    console.log( "left",leftDiff );
     for ( var key in keys ) {
       if ( keyCode === keys[ key ] ) {
         clearTimeout( movementTimeout );
@@ -329,9 +328,11 @@ collisionImg.addEventListener( "load", function() {
           moving = true;
           startMovement();
         }
+  clickMap.addEventListener( "click", onBackgroundClick, false);
         return;
       }
     }
+  clickMap.addEventListener( "click", onBackgroundClick, false);
   }
 
   function keyUp( e ) {
