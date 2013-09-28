@@ -109,15 +109,16 @@ collisionImg.addEventListener( "load", function() {
   canvas.height = collisionImg.height;
   canvas.getContext("2d").drawImage(collisionImg, 0, 0, collisionImg.width, collisionImg.height );
   var collisionData = canvas.getContext("2d");
-  var allCollisionData = collisionData.getImageData( 0, 0, collisionImg.width, collisionImg.height ).data;
+console.log(background.offsetWidth, collisionImg.width);
   playerHeight = player.offsetHeight;
   playerWidth = player.offsetWidth;
   backgroundHeight = background.offsetHeight;
   backgroundWidth = background.offsetWidth;
+  var allCollisionData = collisionData.getImageData( 0, 0, backgroundWidth, backgroundHeight ).data;
 
   function checkCollision( playerLeft, playerTop, backgroundLeft, backgroundTop ) {
     var top = playerTop + playerHeight;
-    var width = collisionImg.width;
+    var width = backgroundWidth;
     for (var i = 0; i < playerWidth; i++) {
       if ( allCollisionData[ ( 4 * ( top ) * width ) + ( 4 * ( playerLeft + i ) ) + 3 ] ) {
         return true;
@@ -328,11 +329,11 @@ collisionImg.addEventListener( "load", function() {
           moving = true;
           startMovement();
         }
-  clickMap.addEventListener( "click", onBackgroundClick, false);
+        clickMap.addEventListener( "click", onBackgroundClick, false);
         return;
       }
     }
-  clickMap.addEventListener( "click", onBackgroundClick, false);
+    clickMap.addEventListener( "click", onBackgroundClick, false);
   }
 
   function keyUp( e ) {
