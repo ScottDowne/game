@@ -1,22 +1,105 @@
-<body style="margin: 0;">
-<div id="background" style="background: url(kq2bgs.png); height: 168px; width: 320px; image-rendering: -moz-crisp-edges;"></div>
-<div id="player" style="position: absolute; top: 60; left:140; background: url(playerUpdate.png); height: 32px; width: 12px; image-rendering: -moz-crisp-edges;"></div>
-<div id="foreground72" style="top: 0; position: absolute; z-index: 72;background: url(kq2bgs72.png);  height: 168px; width: 320px; image-rendering: -moz-crisp-edges;"></div>
-<img id="collision" style="display: none;">
-<div id="foreground98" style="top: 0; position: absolute; z-index: 98;background: url(kq2bgs98.png);  height: 168px; width: 320px; image-rendering: -moz-crisp-edges;"></div>
-<img id="collision" style="display: none;">
-
+<body>
+<div id="mapContainer">
+  <div id="mapOverflow" class="scale">
+    <div id="background" class="scale ground" ></div>
+    <div id="foreground72" class="scale ground"></div>
+    <div id="foreground98" class="scale ground"></div>
+    <div id="playerContainer">
+      <div id="player" class="scale"></div>
+    </div>
+    <div id="collisionContainer">
+      <img id="collision" class="scale">
+    </div>
+  </div>
+</div>
+<div id="scaleContainer">
+  <div id="scale" class="scale"></div>
+</div>
 <select id="speed">
   <option value="50" >Fast</option>
   <option value="100" selected>Normal</option>
   <option value="200" >Slow</option>
   <option value="0">Fastest</option>
 </select>
+
+<style>
+body {
+  margin: 0;
+}
+#mapContainer {
+  position: absolute;
+  height: 168px;
+  width: 320px;
+}
+#playerContainer {
+  top: 0;
+  position: absolute;
+  height: 32px;
+  width: 12px;
+}
+#collisionContainer {
+  top: 0;
+  position: relative;
+  height: 1848px;
+  width: 3520px;
+}
+#scaleContainer {
+  height: 1px;
+  width: 1px;
+}
+#speed {
+  position: absolute;
+  /* change this to scale up */
+  /*top: 168px;*/
+  top: 336px;
+}
+.scale {
+  overflow: hidden;
+  /* change this to scale up */
+  height: 200%;
+  width: 200%;
+}
+#background {
+  background: url(kq2bgs.png);
+  background-size: 1100% 1100%;
+}
+#player {
+  position: absolute;
+  top: 60;
+  left:140;
+  background: url(playerUpdate.png);
+  background-size: 800% 400%;
+  image-rendering: -moz-crisp-edges;
+}
+#foreground72 {
+/*  z-index: 72;*/
+  z-index: 144;
+  background: url(kq2bgs72.png);
+  background-size: 1100% 1100%;
+}
+#foreground98 {
+/*  z-index: 98;*/
+  z-index: 196;
+  background: url(kq2bgs98.png);
+  background-size: 1100% 1100%;
+}
+.ground {
+  top: 0;
+  position: absolute;
+  image-rendering: -moz-crisp-edges;
+}
+#collision {
+  position: absolute;
+}
+</style>
+
 <script>
 var background = document.getElementById( "background" );
 var player = document.getElementById( "player" );
 var collisionImg = document.getElementById( "collision" );
 var speedSelect = document.getElementById( "speed" );
+var scale = document.getElementById("scale").offsetHeight;
+var playerHeight, playerWidth, backgroundHeight, backgroundWidth;
 
 collisionImg.addEventListener( "load", function() {
   var canvas = document.createElement( "canvas" );
@@ -25,11 +108,15 @@ collisionImg.addEventListener( "load", function() {
   canvas.getContext("2d").drawImage(collisionImg, 0, 0, collisionImg.width, collisionImg.height );
   var collisionData = canvas.getContext("2d");
   var allCollisionData = collisionData.getImageData( 0, 0, collisionImg.width, collisionImg.height ).data;
+  playerHeight = player.offsetHeight;
+  playerWidth = player.offsetWidth;
+  backgroundHeight = background.offsetHeight;
+  backgroundWidth = background.offsetWidth;
 
   function checkCollision( playerLeft, playerTop, backgroundLeft, backgroundTop ) {
-    var top = playerTop + 30;
+    var top = playerTop + playerHeight;
     var width = collisionImg.width;
-    for (var i = 0; i < 12; i++) {
+    for (var i = 0; i < playerWidth; i++) {
       if ( allCollisionData[ ( 4 * ( top ) * width ) + ( 4 * ( playerLeft + i ) ) + 3 ] ) {
         return true;
       }
@@ -43,20 +130,15 @@ collisionImg.addEventListener( "load", function() {
   };
 
   var playerPosition = {
-    top: 60,
-    left: 140
+    top: player.offsetTop,
+    left: player.offsetLeft
   }
 
-  player.style.zIndex = 60 + 32;
-
-  var playerMod = {
-    top: 2,
-    left: 2
-  }
+  player.style.zIndex = playerPosition.top + playerHeight;
 
   var backgroundMod = {
-    top: 168,
-    left: 320
+    top: backgroundHeight,
+    left: backgroundWidth
   };
 
   var currentKeys = {
@@ -95,8 +177,13 @@ collisionImg.addEventListener( "load", function() {
   var numberOfFrames = 8;
 
   var frameMod = {
-    left: 12,
-    top: 32
+    left: playerWidth,
+    top: playerHeight
+  };
+
+  var movementMod = {
+    left: 2 * scale,
+    top: 1 * scale
   };
 
   var currentFrame = {
@@ -121,38 +208,38 @@ collisionImg.addEventListener( "load", function() {
     var moved = false;
     if ( currentKeys.up ) {
       currentFrame.top = 1;
-      if ( !checkCollision( playerPosition.left, playerPosition.top-1 ) ) {
+      if ( !checkCollision( playerPosition.left, playerPosition.top-movementMod.top ) ) {
         moved = true;
-        playerPosition.top--;
+        playerPosition.top-=movementMod.top;
       }
     }
     if ( currentKeys.down ) {
       currentFrame.top = 2;
-      if ( !checkCollision( playerPosition.left, playerPosition.top+1 ) ) {
+      if ( !checkCollision( playerPosition.left, playerPosition.top+movementMod.top ) ) {
         moved = true;
-        playerPosition.top++;
+        playerPosition.top+=movementMod.top;
       }
     }
     if ( currentKeys.left ) {
       currentFrame.top = 3;
-      if ( !checkCollision( playerPosition.left-2, playerPosition.top ) ) {
+      if ( !checkCollision( playerPosition.left-movementMod.left, playerPosition.top ) ) {
         moved = true;
-        playerPosition.left-=2;
+        playerPosition.left-=movementMod.left;
       }
     }
     if ( currentKeys.right ) {
       currentFrame.top = 0;
-      if ( !checkCollision( playerPosition.left+2, playerPosition.top ) ) {
+      if ( !checkCollision( playerPosition.left+movementMod.left, playerPosition.top ) ) {
         moved = true;
-        playerPosition.left+=2;
+        playerPosition.left+=movementMod.left;
       }
     }
     
     if ( playerPosition.top < 0 ) {
       currentBackground.top++;
-      playerPosition.top = 168-32;
+      playerPosition.top = backgroundHeight-playerHeight;
     clearMovement();
-    } else if ( playerPosition.top > (168-32) ) {
+    } else if ( playerPosition.top > (backgroundHeight-playerHeight) ) {
       currentBackground.top--;
       playerPosition.top = 0;
     clearMovement();
@@ -160,9 +247,9 @@ collisionImg.addEventListener( "load", function() {
 
     if ( playerPosition.left < 0 ) {
       currentBackground.left++;
-      playerPosition.left = 320-12;
+      playerPosition.left = backgroundWidth-playerWidth;
       clearMovement();
-    } else if ( playerPosition.left > (320-12) ) {
+    } else if ( playerPosition.left > (backgroundWidth-playerWidth) ) {
       currentBackground.left--;
       playerPosition.left = 0;
       clearMovement();
@@ -171,7 +258,7 @@ collisionImg.addEventListener( "load", function() {
     player.style.top = ( playerPosition.top ) + "px";
 
     if ( moved ) {
-      player.style.zIndex = playerPosition.top + 32;
+      player.style.zIndex = playerPosition.top + playerHeight;
       currentFrame.left--;
       if ( currentFrame >= numberOfFrames ) {
         currentFrame.left = 0;
