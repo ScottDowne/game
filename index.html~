@@ -119,9 +119,9 @@ collisionImg.addEventListener( "load", function() {
     var top = playerTop + playerHeight;
     var width = backgroundWidth;
     for (var i = 0; i < playerWidth; i++) {
-      //if ( allCollisionData[ ( 4 * ( top ) * width ) + ( 4 * ( playerLeft + i ) ) + 3 ] ) {
-      //  return true;
-      //}
+      if ( allCollisionData[ ( 4 * ( top ) * width ) + ( 4 * ( playerLeft + i ) ) + 3 ] ) {
+        return true;
+      }
     }
     return false;
   }
@@ -240,11 +240,11 @@ collisionImg.addEventListener( "load", function() {
     if ( playerPosition.top < 0 ) {
       currentBackground.top++;
       playerPosition.top = backgroundHeight-playerHeight;
-    clearMovement();
+      clearMovement();
     } else if ( playerPosition.top > (backgroundHeight-playerHeight) ) {
       currentBackground.top--;
       playerPosition.top = 0;
-    clearMovement();
+      clearMovement();
     }
 
     if ( playerPosition.left < 0 ) {
@@ -299,7 +299,7 @@ collisionImg.addEventListener( "load", function() {
   }
 
   function onBackgroundClick( e ) {
-    clickMap.removeEventListener( "click", onBackgroundClick, false);
+    clickMap.removeEventListener( "mousedown", onBackgroundClick, false);
     var topDiff = e.clientY - playerPosition.top;
     var leftDiff = e.clientX - playerPosition.left;
     var keyCode;
@@ -328,11 +328,11 @@ collisionImg.addEventListener( "load", function() {
           moving = true;
           startMovement();
         }
-        clickMap.addEventListener( "click", onBackgroundClick, false);
+        clickMap.addEventListener( "mousedown", onBackgroundClick, false);
         return;
       }
     }
-    clickMap.addEventListener( "click", onBackgroundClick, false);
+    clickMap.addEventListener( "mousedown", onBackgroundClick, false);
   }
 
   function keyUp( e ) {
@@ -340,7 +340,7 @@ collisionImg.addEventListener( "load", function() {
     document.removeEventListener( "keyup", keyUp, false);
   }
 
-  clickMap.addEventListener( "click", onBackgroundClick, false);
+  clickMap.addEventListener( "mousedown", onBackgroundClick, false);
   document.addEventListener( "keydown", keyDown, false);
 }, false );
 
