@@ -5,18 +5,18 @@
 <img id="collision" style="display: none;">
 <div id="foreground98" style="top: 0; position: absolute; z-index: 98;background: url(kq2bgs98.png);  height: 168px; width: 320px; image-rendering: -moz-crisp-edges;"></div>
 <img id="collision" style="display: none;">
-<!-- speed change disabled because of key event conflicting -->
-<!--<select id="speed">
+
+<select id="speed">
   <option value="50" >Fast</option>
   <option value="100" selected>Normal</option>
   <option value="200" >Slow</option>
   <option value="0">Fastest</option>
-</select>-->
+</select>
 <script>
 var background = document.getElementById( "background" );
 var player = document.getElementById( "player" );
 var collisionImg = document.getElementById( "collision" );
-//var speedSelect = document.getElementById( "speed" );
+var speedSelect = document.getElementById( "speed" );
 
 collisionImg.addEventListener( "load", function() {
   var canvas = document.createElement( "canvas" );
@@ -73,25 +73,23 @@ collisionImg.addEventListener( "load", function() {
     down: 40
   };
 
-  // speed changing disabled because of key event conflicting
-  var speed = 30;//speedSelect.value;
-/*
+  var speed = speedSelect.value;
+
   function speedSelectChange( e ) {
     document.addEventListener( "keydown", keyDown, false);
-    speedSelect.addEventListener( "mousedown", speedSelectMouseDown, false );
     speed = this.value;
     this.blur();
   }
 
-  function speedSelectMouseDown( e ) {
-    speedSelect.removeEventListener( "mousedown", speedSelectMouseDown, false );
+  function speedSelectFocus( e ) {
     document.removeEventListener( "keydown", keyDown, false);
     clearMovement();
   }
 
   speedSelect.addEventListener( "change", speedSelectChange, false );
-  speedSelect.addEventListener( "mousedown", speedSelectMouseDown, false );
-*/
+  speedSelect.addEventListener( "focus", speedSelectFocus, false );
+  speedSelect.addEventListener( "blur", speedSelectChange, false );
+
   var moving = false;
   var movementTimeout;
   var numberOfFrames = 8;
@@ -184,7 +182,6 @@ collisionImg.addEventListener( "load", function() {
   }
 
   function startMovement() {
-console.log("starting");
     if ( !moving ) {
       return;
     }
