@@ -119,9 +119,9 @@ collisionImg.addEventListener( "load", function() {
     var top = playerTop + playerHeight;
     var width = backgroundWidth;
     for (var i = 0; i < playerWidth; i++) {
-      //if ( allCollisionData[ ( 4 * ( top ) * width ) + ( 4 * ( playerLeft + i ) ) + 3 ] ) {
-      //  return true;
-      //}
+      if ( allCollisionData[ ( 4 * ( top ) * width ) + ( 4 * ( playerLeft + i ) ) + 3 ] ) {
+        return true;
+      }
     }
     return false;
   }
@@ -240,11 +240,11 @@ collisionImg.addEventListener( "load", function() {
     if ( playerPosition.top < 0 ) {
       currentBackground.top++;
       playerPosition.top = backgroundHeight-playerHeight;
-    clearMovement();
+      clearMovement();
     } else if ( playerPosition.top > (backgroundHeight-playerHeight) ) {
       currentBackground.top--;
       playerPosition.top = 0;
-    clearMovement();
+      clearMovement();
     }
 
     if ( playerPosition.left < 0 ) {
