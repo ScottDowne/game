@@ -50,7 +50,8 @@ body {
 #speed {
   position: absolute;
   /* change this to scale up */
-  top: 168px;
+  /*top: 168px;*/
+  top: 336px;
 }
 .scale {
   overflow: hidden;
@@ -89,11 +90,13 @@ body {
 }
 #collision {
   position: absolute;
+  image-rendering: -moz-crisp-edges;
 }
 </style>
 
 <script>
 var background = document.getElementById( "background" );
+var clickMap = document.getElementById( "mapOverflow" );
 var player = document.getElementById( "player" );
 var collisionImg = document.getElementById( "collision" );
 var speedSelect = document.getElementById( "speed" );
@@ -281,17 +284,53 @@ collisionImg.addEventListener( "load", function() {
     for ( var key in keys ) {
       if ( e.keyCode === keys[ key ] ) {
         clearTimeout( movementTimeout );
-      if ( currentKeys[ key ] ) {
-        currentKeys[ key ] = false;
-        moving = false;
-      } else {
-        clearKeys();
-        currentKeys[ key ] = true;
-        moving = true;
-        startMovement();
+        if ( currentKeys[ key ] ) {
+          currentKeys[ key ] = false;
+          moving = false;
+        } else {
+          clearKeys();
+          currentKeys[ key ] = true;
+          moving = true;
+          startMovement();
+        }
+        return;
       }
-      return;
     }
+  }
+
+  function onBackgroundClick( e ) {
+    var topDiff = e.clientY - playerPosition.top;
+    var leftDiff = e.clientX - playerPosition.left;
+    var keyCode;
+    if (Math.abs(topDiff) > Math.abs(leftDiff)) {
+      if ( leftDiff > 0 ) {
+        keyCode = 39;
+      } else {
+        keyCode = 37;
+      }
+    } else {
+      if ( topDiff > 0 ) {
+        keyCode = 40;
+      } else {
+        keyCode = 38;
+      }
+    }
+    console.log( "top",topDiff );
+    console.log( "left",leftDiff );
+    for ( var key in keys ) {
+      if ( keyCode === keys[ key ] ) {
+        clearTimeout( movementTimeout );
+        if ( currentKeys[ key ] ) {
+          currentKeys[ key ] = false;
+          moving = false;
+        } else {
+          clearKeys();
+          currentKeys[ key ] = true;
+          moving = true;
+          startMovement();
+        }
+        return;
+      }
     }
   }
 
@@ -300,6 +339,7 @@ collisionImg.addEventListener( "load", function() {
     document.removeEventListener( "keyup", keyUp, false);
   }
 
+  clickMap.addEventListener( "click", onBackgroundClick, false);
   document.addEventListener( "keydown", keyDown, false);
 }, false );
 
