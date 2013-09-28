@@ -1,18 +1,22 @@
 <body style="margin: 0;">
 <div id="background" style="background: url(kq2bgs.png); height: 168px; width: 320px; image-rendering: -moz-crisp-edges;"></div>
 <div id="player" style="position: absolute; top: 60; left:140; background: url(playerUpdate.png); height: 32px; width: 12px; image-rendering: -moz-crisp-edges;"></div>
+<div id="foreground72" style="top: 0; position: absolute; z-index: 72;background: url(kq2bgs72.png);  height: 168px; width: 320px; image-rendering: -moz-crisp-edges;"></div>
 <img id="collision" style="display: none;">
-<select id="speed">
+<div id="foreground98" style="top: 0; position: absolute; z-index: 98;background: url(kq2bgs98.png);  height: 168px; width: 320px; image-rendering: -moz-crisp-edges;"></div>
+<img id="collision" style="display: none;">
+<!-- speed change disabled because of key event conflicting -->
+<!--<select id="speed">
   <option value="50" >Fast</option>
   <option value="100" selected>Normal</option>
   <option value="200" >Slow</option>
   <option value="0">Fastest</option>
-</select>
+</select>-->
 <script>
 var background = document.getElementById( "background" );
 var player = document.getElementById( "player" );
 var collisionImg = document.getElementById( "collision" );
-var speedSelect = document.getElementById( "speed" );
+//var speedSelect = document.getElementById( "speed" );
 
 collisionImg.addEventListener( "load", function() {
   var canvas = document.createElement( "canvas" );
@@ -43,6 +47,8 @@ collisionImg.addEventListener( "load", function() {
     left: 140
   }
 
+  player.style.zIndex = 60 + 32;
+
   var playerMod = {
     top: 2,
     left: 2
@@ -67,8 +73,9 @@ collisionImg.addEventListener( "load", function() {
     down: 40
   };
 
-  var speed = speedSelect.value;
-
+  // speed changing disabled because of key event conflicting
+  var speed = 30;//speedSelect.value;
+/*
   function speedSelectChange( e ) {
     document.addEventListener( "keydown", keyDown, false);
     speedSelect.addEventListener( "mousedown", speedSelectMouseDown, false );
@@ -84,6 +91,7 @@ collisionImg.addEventListener( "load", function() {
 
   speedSelect.addEventListener( "change", speedSelectChange, false );
   speedSelect.addEventListener( "mousedown", speedSelectMouseDown, false );
+*/
   var moving = false;
   var movementTimeout;
   var numberOfFrames = 8;
@@ -155,16 +163,17 @@ collisionImg.addEventListener( "load", function() {
     if ( playerPosition.left < 0 ) {
       currentBackground.left++;
       playerPosition.left = 320-12;
-    clearMovement();
+      clearMovement();
     } else if ( playerPosition.left > (320-12) ) {
       currentBackground.left--;
       playerPosition.left = 0;
-    clearMovement();
+      clearMovement();
     }
     player.style.left = ( playerPosition.left ) + "px";
     player.style.top = ( playerPosition.top ) + "px";
 
     if ( moved ) {
+      player.style.zIndex = playerPosition.top + 32;
       currentFrame.left--;
       if ( currentFrame >= numberOfFrames ) {
         currentFrame.left = 0;
@@ -175,6 +184,7 @@ collisionImg.addEventListener( "load", function() {
   }
 
   function startMovement() {
+console.log("starting");
     if ( !moving ) {
       return;
     }
@@ -190,7 +200,7 @@ collisionImg.addEventListener( "load", function() {
         clearTimeout( movementTimeout );
       if ( currentKeys[ key ] ) {
         currentKeys[ key ] = false;
-      moving = false;
+        moving = false;
       } else {
         clearKeys();
         currentKeys[ key ] = true;

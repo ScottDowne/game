@@ -1,190 +1,225 @@
 <body style="margin: 0;">
 <div id="background" style="background: url(kq2bgs.png); height: 168px; width: 320px; image-rendering: -moz-crisp-edges;"></div>
 <div id="player" style="position: absolute; top: 60; left:140; background: url(playerUpdate.png); height: 32px; width: 12px; image-rendering: -moz-crisp-edges;"></div>
-<img id="collision" style="display: none;" src="kq2bgsCollision.png">
+<div id="foreground71" style="top: 0; position: absolute; z-index: 72;background: url(kq2bgs71.png);  height: 168px; width: 320px; image-rendering: -moz-crisp-edges;"></div>
+<img id="collision" style="display: none;">
+<div id="foreground98" style="top: 0; position: absolute; z-index: 98;background: url(kq2bgs98.png);  height: 168px; width: 320px; image-rendering: -moz-crisp-edges;"></div>
+<img id="collision" style="display: none;">
+<!-- speed change disabled because of key event conflicting -->
+<!--<select id="speed">
+  <option value="50" >Fast</option>
+  <option value="100" selected>Normal</option>
+  <option value="200" >Slow</option>
+  <option value="0">Fastest</option>
+</select>-->
 <script>
 var background = document.getElementById( "background" );
 var player = document.getElementById( "player" );
 var collisionImg = document.getElementById( "collision" );
+//var speedSelect = document.getElementById( "speed" );
 
-var canvas = document.createElement( "canvas" );
-canvas.width = collisionImg.width;
-canvas.height = collisionImg.height;
-canvas.getContext("2d").drawImage(collisionImg, 0, 0, collisionImg.width, collisionImg.height);
-var collisionData = canvas.getContext("2d");
+collisionImg.addEventListener( "load", function() {
+  var canvas = document.createElement( "canvas" );
+  canvas.width = collisionImg.width;
+  canvas.height = collisionImg.height;
+  canvas.getContext("2d").drawImage(collisionImg, 0, 0, collisionImg.width, collisionImg.height );
+  var collisionData = canvas.getContext("2d");
+  var allCollisionData = collisionData.getImageData( 0, 0, collisionImg.width, collisionImg.height ).data;
 
-function checkCollision( playerLeft, playerTop, backgroundLeft, backgroundTop ) {
-  var pixel = collisionData.getImageData( playerLeft, playerTop+30, 12, 1 );
-  for (var i = 0; i < 12; i++) {
-  if ( pixel.data[ i*3 ] ) {
-    return true;
-  }
-  }
-  return false;
-}
-
-var currentBackground = {
-  top: 0,
-  left: 0
-};
-
-var playerPosition = {
-  top: 60,
-  left: 140
-}
-
-var playerMod = {
-  top: 2,
-  left: 2
-}
-
-var backgroundMod = {
-  top: 168,
-  left: 320
-};
-
-var currentKeys = {
-  up: false,
-  left: false,
-  right: false,
-  down: false
-};
-
-var keys = {
-  up: 38,
-  left: 37,
-  right: 39,
-  down: 40
-};
-// fastest 0
-// fast 50
-// normal 100
-// slow 200
-var speed = 100;
-var moving = false;
-var movementTimeout;
-var numberOfFrames = 8;
-
-var frameMod = {
-  left: 12,
-  top: 32
-};
-
-var currentFrame = {
-  top: 0,
-  left: 0
-};
-
-function clearKeys() {
-  currentKeys[ "up" ] = false;
-  currentKeys[ "down" ] = false;
-  currentKeys[ "left" ] = false;
-  currentKeys[ "right" ] = false;
-}
-
-function clearMovement() {
-  clearTimeout( movementTimeout );
-  clearKeys();
-  moving = false;
-}
-
-function processMovement() {
-  var moved = false;
-  if ( currentKeys.up ) {
-    currentFrame.top = 1;
-    if ( !checkCollision( playerPosition.left, playerPosition.top-1 ) ) {
-      moved = true;
-      playerPosition.top--;
+  function checkCollision( playerLeft, playerTop, backgroundLeft, backgroundTop ) {
+    var top = playerTop + 30;
+    var width = collisionImg.width;
+    for (var i = 0; i < 12; i++) {
+      if ( allCollisionData[ ( 4 * ( top ) * width ) + ( 4 * ( playerLeft + i ) ) + 3 ] ) {
+        return true;
+      }
     }
-  }
-  if ( currentKeys.down ) {
-    currentFrame.top = 2;
-    if ( !checkCollision( playerPosition.left, playerPosition.top+1 ) ) {
-      moved = true;
-      playerPosition.top++;
-    }
-  }
-  if ( currentKeys.left ) {
-    currentFrame.top = 3;
-    if ( !checkCollision( playerPosition.left-2, playerPosition.top ) ) {
-      moved = true;
-      playerPosition.left-=2;
-    }
-  }
-  if ( currentKeys.right ) {
-    currentFrame.top = 0;
-    if ( !checkCollision( playerPosition.left+2, playerPosition.top ) ) {
-      moved = true;
-      playerPosition.left+=2;
-    }
-  }
-  
-  if ( playerPosition.top < 0 ) {
-    currentBackground.top++;
-    playerPosition.top = 168-32;
-  clearMovement();
-  } else if ( playerPosition.top > (168-32) ) {
-    currentBackground.top--;
-    playerPosition.top = 0;
-  clearMovement();
+    return false;
   }
 
-  if ( playerPosition.left < 0 ) {
-    currentBackground.left++;
-    playerPosition.left = 320-12;
-  clearMovement();
-  } else if ( playerPosition.left > (320-12) ) {
-    currentBackground.left--;
-    playerPosition.left = 0;
-  clearMovement();
-  }
-  player.style.left = ( playerPosition.left ) + "px";
-  player.style.top = ( playerPosition.top ) + "px";
+  var currentBackground = {
+    top: 0,
+    left: 0
+  };
 
-  if ( moved ) {
-    currentFrame.left--;
-    if ( currentFrame >= numberOfFrames ) {
-      currentFrame.left = 0;
-    }
+  var playerPosition = {
+    top: 60,
+    left: 140
   }
-  player.style.backgroundPosition = ( currentFrame.left * frameMod.left ) + "px " + ( currentFrame.top * frameMod.top ) + "px"; 
-  background.style.backgroundPosition = ( currentBackground.left * backgroundMod.left ) + "px " + ( currentBackground.top * backgroundMod.top ) + "px";
-}
 
-function startMovement() {
-  if ( !moving ) {
-    return;
+  player.style.zIndex = 60 + 32;
+
+  var playerMod = {
+    top: 2,
+    left: 2
   }
-  processMovement();
-  movementTimeout = setTimeout( startMovement, speed );
-}
 
-function keyDown( e ) {
-  document.removeEventListener( "keydown", keyDown, false);
-  document.addEventListener( "keyup", keyUp, false);
-  for ( var key in keys ) {
-    if ( e.keyCode === keys[ key ] ) {
-      clearTimeout( movementTimeout );
-    if ( currentKeys[ key ] ) {
-      currentKeys[ key ] = false;
+  var backgroundMod = {
+    top: 168,
+    left: 320
+  };
+
+  var currentKeys = {
+    up: false,
+    left: false,
+    right: false,
+    down: false
+  };
+
+  var keys = {
+    up: 38,
+    left: 37,
+    right: 39,
+    down: 40
+  };
+
+  // speed changing disabled because of key event conflicting
+  var speed = 30;//speedSelect.value;
+/*
+  function speedSelectChange( e ) {
+    document.addEventListener( "keydown", keyDown, false);
+    speedSelect.addEventListener( "mousedown", speedSelectMouseDown, false );
+    speed = this.value;
+    this.blur();
+  }
+
+  function speedSelectMouseDown( e ) {
+    speedSelect.removeEventListener( "mousedown", speedSelectMouseDown, false );
+    document.removeEventListener( "keydown", keyDown, false);
+    clearMovement();
+  }
+
+  speedSelect.addEventListener( "change", speedSelectChange, false );
+  speedSelect.addEventListener( "mousedown", speedSelectMouseDown, false );
+*/
+  var moving = false;
+  var movementTimeout;
+  var numberOfFrames = 8;
+
+  var frameMod = {
+    left: 12,
+    top: 32
+  };
+
+  var currentFrame = {
+    top: 0,
+    left: 0
+  };
+
+  function clearKeys() {
+    currentKeys[ "up" ] = false;
+    currentKeys[ "down" ] = false;
+    currentKeys[ "left" ] = false;
+    currentKeys[ "right" ] = false;
+  }
+
+  function clearMovement() {
+    clearTimeout( movementTimeout );
+    clearKeys();
     moving = false;
-    } else {
-        clearKeys();
-      currentKeys[ key ] = true;
-    moving = true;
-        startMovement();
+  }
+
+  function processMovement() {
+    var moved = false;
+    if ( currentKeys.up ) {
+      currentFrame.top = 1;
+      if ( !checkCollision( playerPosition.left, playerPosition.top-1 ) ) {
+        moved = true;
+        playerPosition.top--;
+      }
     }
-    return;
-  }
-  }
-}
+    if ( currentKeys.down ) {
+      currentFrame.top = 2;
+      if ( !checkCollision( playerPosition.left, playerPosition.top+1 ) ) {
+        moved = true;
+        playerPosition.top++;
+      }
+    }
+    if ( currentKeys.left ) {
+      currentFrame.top = 3;
+      if ( !checkCollision( playerPosition.left-2, playerPosition.top ) ) {
+        moved = true;
+        playerPosition.left-=2;
+      }
+    }
+    if ( currentKeys.right ) {
+      currentFrame.top = 0;
+      if ( !checkCollision( playerPosition.left+2, playerPosition.top ) ) {
+        moved = true;
+        playerPosition.left+=2;
+      }
+    }
+    
+    if ( playerPosition.top < 0 ) {
+      currentBackground.top++;
+      playerPosition.top = 168-32;
+    clearMovement();
+    } else if ( playerPosition.top > (168-32) ) {
+      currentBackground.top--;
+      playerPosition.top = 0;
+    clearMovement();
+    }
 
-function keyUp( e ) {
+    if ( playerPosition.left < 0 ) {
+      currentBackground.left++;
+      playerPosition.left = 320-12;
+      clearMovement();
+    } else if ( playerPosition.left > (320-12) ) {
+      currentBackground.left--;
+      playerPosition.left = 0;
+      clearMovement();
+    }
+    player.style.left = ( playerPosition.left ) + "px";
+    player.style.top = ( playerPosition.top ) + "px";
+
+    if ( moved ) {
+      player.style.zIndex = playerPosition.top + 32;
+      currentFrame.left--;
+      if ( currentFrame >= numberOfFrames ) {
+        currentFrame.left = 0;
+      }
+    }
+    player.style.backgroundPosition = ( currentFrame.left * frameMod.left ) + "px " + ( currentFrame.top * frameMod.top ) + "px"; 
+    background.style.backgroundPosition = ( currentBackground.left * backgroundMod.left ) + "px " + ( currentBackground.top * backgroundMod.top ) + "px";
+  }
+
+  function startMovement() {
+console.log("starting");
+    if ( !moving ) {
+      return;
+    }
+    processMovement();
+    movementTimeout = setTimeout( startMovement, speed );
+  }
+
+  function keyDown( e ) {
+    document.removeEventListener( "keydown", keyDown, false);
+    document.addEventListener( "keyup", keyUp, false);
+    for ( var key in keys ) {
+      if ( e.keyCode === keys[ key ] ) {
+        clearTimeout( movementTimeout );
+      if ( currentKeys[ key ] ) {
+        currentKeys[ key ] = false;
+        moving = false;
+      } else {
+        clearKeys();
+        currentKeys[ key ] = true;
+        moving = true;
+        startMovement();
+      }
+      return;
+    }
+    }
+  }
+
+  function keyUp( e ) {
+    document.addEventListener( "keydown", keyDown, false);
+    document.removeEventListener( "keyup", keyUp, false);
+  }
+
   document.addEventListener( "keydown", keyDown, false);
-  document.removeEventListener( "keyup", keyUp, false);
-}
+}, false );
 
-document.addEventListener( "keydown", keyDown, false);
-
+collisionImg.src = "kq2bgsCollision.png";
 </script>
 </body>
