@@ -352,7 +352,7 @@ collisionImg.addEventListener( "load", function() {
   function removeClick() {}
   function setMouseEvents( e ) {
     addClick = function() {
-      //clickMap.addEventListener( "mousedown", onBackgroundMouseClick, false);
+      clickMap.addEventListener( "mousedown", onBackgroundMouseClick, false);
     }
     removeClick = function() {
       clickMap.removeEventListener( "mousedown", onBackgroundMouseClick, false);
