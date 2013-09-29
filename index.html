@@ -359,18 +359,18 @@ collisionImg.addEventListener( "load", function() {
     }
     clickMap.removeEventListener( "touchstart", setTouchEvents, false);
     clickMap.removeEventListener( "mousedown", setMouseEvents, false);
-    onBackgroundClick( e.clientX, e.clientY );
+    onBackgroundMouseClick( e );
   }
   function setTouchEvents( e ) {
     addClick = function() {
-      //clickMap.addEventListener( "touchstart", onBackgroundTouchClick, false);
+      clickMap.addEventListener( "touchstart", onBackgroundTouchClick, false);
     }
     removeClick = function() {
       clickMap.removeEventListener( "touchstart", onBackgroundTouchClick, false);
     }
     clickMap.removeEventListener( "mousedown", setMouseEvents, false);
     clickMap.removeEventListener( "touchstart", setTouchEvents, false);
-    onBackgroundClick( e );
+    onBackgroundTouchClick( e );
   }
 
   clickMap.addEventListener( "mousedown", setMouseEvents, false);
