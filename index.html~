@@ -363,7 +363,7 @@ collisionImg.addEventListener( "load", function() {
   }
   function setTouchEvents( e ) {
     addClick = function() {
-      clickMap.addEventListener( "touchstart", onBackgroundTouchClick, false);
+      //clickMap.addEventListener( "touchstart", onBackgroundTouchClick, false);
     }
     removeClick = function() {
       clickMap.removeEventListener( "touchstart", onBackgroundTouchClick, false);
