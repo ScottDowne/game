@@ -2,8 +2,6 @@
 <div id="mapContainer">
   <div id="mapOverflow" class="scale">
     <div id="background" class="scale ground" ></div>
-    <div id="foreground72" class="scale ground"></div>
-    <div id="foreground98" class="scale ground"></div>
     <div id="playerContainer">
       <div id="player" class="scale"></div>
     </div>
@@ -71,18 +69,6 @@ body {
   background-size: 800% 400%;
   image-rendering: -moz-crisp-edges;
 }
-#foreground72 {
-/*  z-index: 72;*/
-  z-index: 144;
-  background: url(kq2bgs72.png);
-  background-size: 1100% 1100%;
-}
-#foreground98 {
-/*  z-index: 98;*/
-  z-index: 196;
-  background: url(kq2bgs98.png);
-  background-size: 1100% 1100%;
-}
 .ground {
   top: 0;
   position: absolute;
@@ -91,11 +77,13 @@ body {
 #collision {
   position: absolute;
   image-rendering: -moz-crisp-edges;
+  visibility: hidden;
 }
 </style>
 
 <script>
 var background = document.getElementById( "background" );
+var foregrounds = [];
 var clickMap = document.getElementById( "mapOverflow" );
 var player = document.getElementById( "player" );
 var collisionImg = document.getElementById( "collision" );
@@ -113,6 +101,17 @@ collisionImg.addEventListener( "load", function() {
   playerWidth = player.offsetWidth;
   backgroundHeight = background.offsetHeight;
   backgroundWidth = background.offsetWidth;
+  // Create foreground layers.
+  for ( var i = 0; i < ( backgroundHeight / scale ); i++ ) {
+    foregrounds.push( document.createElement( "div" ) );
+    foregrounds[ i ].classList.add( "scale" );
+    foregrounds[ i ].classList.add( "ground" );
+    foregrounds[ i ].style.zIndex = i;
+    foregrounds[ i ].style.background = "url(kq2bgs" + i + ".png)";
+    foregrounds[ i ].style.backgroundSize = "1100% 1100%";
+    clickMap.appendChild( foregrounds[ i ] );
+  }
+  // I am assuming we're starting at the 0, 0 screen for now.
   var allCollisionData = collisionData.getImageData( 0, 0, backgroundWidth, backgroundHeight ).data;
 
   function checkCollision( playerLeft, playerTop, backgroundLeft, backgroundTop ) {
@@ -136,7 +135,7 @@ collisionImg.addEventListener( "load", function() {
     left: player.offsetLeft
   }
 
-  player.style.zIndex = playerPosition.top + playerHeight;
+  player.style.zIndex = ( playerPosition.top + playerHeight ) / scale;
 
   var backgroundMod = {
     top: backgroundHeight,
@@ -206,33 +205,52 @@ collisionImg.addEventListener( "load", function() {
     moving = false;
   }
 
+  function updateBackground() {
+    var pixelPositionLeft = currentBackground.left * backgroundMod.left;
+    var pixelPositionTop = currentBackground.top * backgroundMod.top;
+    allCollisionData = collisionData.getImageData( pixelPositionLeft, pixelPositionTop, backgroundWidth, backgroundHeight ).data;
+    var bakgroundPosition = pixelPositionLeft + "px " + pixelPositionTop + "px";
+    background.style.backgroundPosition = bakgroundPosition;
+    for ( var i = 0; i < ( backgroundHeight / scale ); i++ ) {
+      foregrounds[ i ].style.backgroundPosition = bakgroundPosition;
+    }
+  }
+
+  function updatePlayer() {
+    player.style.zIndex = ( playerPosition.top + playerHeight ) / scale;
+    currentFrame.left--;
+    if ( currentFrame >= numberOfFrames ) {
+      currentFrame.left = 0;
+    }
+    player.style.backgroundPosition = ( currentFrame.left * frameMod.left ) + "px " + ( currentFrame.top * frameMod.top ) + "px";
+  }
+
   function processMovement() {
-    var moved = false;
     if ( currentKeys.up ) {
       currentFrame.top = 1;
       if ( !checkCollision( playerPosition.left, playerPosition.top-movementMod.top ) ) {
-        moved = true;
+        updatePlayer();
         playerPosition.top-=movementMod.top;
       }
     }
     if ( currentKeys.down ) {
       currentFrame.top = 2;
       if ( !checkCollision( playerPosition.left, playerPosition.top+movementMod.top ) ) {
-        moved = true;
+        updatePlayer();
         playerPosition.top+=movementMod.top;
       }
     }
     if ( currentKeys.left ) {
       currentFrame.top = 3;
       if ( !checkCollision( playerPosition.left-movementMod.left, playerPosition.top ) ) {
-        moved = true;
+        updatePlayer();
         playerPosition.left-=movementMod.left;
       }
     }
     if ( currentKeys.right ) {
       currentFrame.top = 0;
       if ( !checkCollision( playerPosition.left+movementMod.left, playerPosition.top ) ) {
-        moved = true;
+        updatePlayer();
         playerPosition.left+=movementMod.left;
       }
     }
@@ -241,33 +259,27 @@ collisionImg.addEventListener( "load", function() {
       currentBackground.top++;
       playerPosition.top = backgroundHeight-playerHeight;
       clearMovement();
+      updateBackground();
     } else if ( playerPosition.top > (backgroundHeight-playerHeight) ) {
       currentBackground.top--;
       playerPosition.top = 0;
       clearMovement();
+      updateBackground();
     }
 
     if ( playerPosition.left < 0 ) {
       currentBackground.left++;
       playerPosition.left = backgroundWidth-playerWidth;
       clearMovement();
+      updateBackground();
     } else if ( playerPosition.left > (backgroundWidth-playerWidth) ) {
       currentBackground.left--;
       playerPosition.left = 0;
       clearMovement();
+      updateBackground();
     }
     player.style.left = ( playerPosition.left ) + "px";
     player.style.top = ( playerPosition.top ) + "px";
-
-    if ( moved ) {
-      player.style.zIndex = playerPosition.top + playerHeight;
-      currentFrame.left--;
-      if ( currentFrame >= numberOfFrames ) {
-        currentFrame.left = 0;
-      }
-    }
-    player.style.backgroundPosition = ( currentFrame.left * frameMod.left ) + "px " + ( currentFrame.top * frameMod.top ) + "px"; 
-    background.style.backgroundPosition = ( currentBackground.left * backgroundMod.left ) + "px " + ( currentBackground.top * backgroundMod.top ) + "px";
   }
 
   function startMovement() {
@@ -316,6 +328,7 @@ collisionImg.addEventListener( "load", function() {
         keyCode = 38;
       }
     }
+    // Do something with this function, too much like the one above.
     for ( var key in keys ) {
       if ( keyCode === keys[ key ] ) {
         clearTimeout( movementTimeout );
@@ -370,7 +383,7 @@ collisionImg.addEventListener( "load", function() {
     }
     clickMap.removeEventListener( "mousedown", setMouseEvents, false);
     clickMap.removeEventListener( "touchstart", setTouchEvents, false);
-    onBackgroundClick( e );
+    onBackgroundTouchClick( e );
   }
 
   clickMap.addEventListener( "mousedown", setMouseEvents, false);
