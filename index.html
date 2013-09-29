@@ -299,7 +299,6 @@ collisionImg.addEventListener( "load", function() {
   }
 
   function onBackgroundClick( x, y ) {
-console.log(x, y);
     removeClick();
     var topDiff = y - playerPosition.top;
     var leftDiff = x - playerPosition.left;
@@ -364,7 +363,7 @@ console.log(x, y);
   }
   function setTouchEvents( e ) {
     addClick = function() {
-      clickMap.addEventListener( "touchstart", onBackgroundTouchClick, false);
+      //clickMap.addEventListener( "touchstart", onBackgroundTouchClick, false);
     }
     removeClick = function() {
       clickMap.removeEventListener( "touchstart", onBackgroundTouchClick, false);

@@ -203,7 +203,7 @@ collisionImg.addEventListener( "load", function() {
   function clearMovement() {
     clearTimeout( movementTimeout );
     clearKeys();
-    //moving = false;
+    moving = false;
   }
 
   function processMovement() {
@@ -286,7 +286,7 @@ collisionImg.addEventListener( "load", function() {
         clearTimeout( movementTimeout );
         if ( currentKeys[ key ] ) {
           currentKeys[ key ] = false;
-          //moving = false;
+          moving = false;
         } else {
           clearKeys();
           currentKeys[ key ] = true;
@@ -299,7 +299,6 @@ collisionImg.addEventListener( "load", function() {
   }
 
   function onBackgroundClick( x, y ) {
-console.log(x, y);
     removeClick();
     var topDiff = y - playerPosition.top;
     var leftDiff = x - playerPosition.left;
@@ -322,7 +321,7 @@ console.log(x, y);
         clearTimeout( movementTimeout );
         if ( currentKeys[ key ] ) {
           currentKeys[ key ] = false;
-          //moving = false;
+          moving = false;
         } else {
           clearKeys();
           currentKeys[ key ] = true;
